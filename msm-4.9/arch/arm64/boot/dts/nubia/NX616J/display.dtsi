@@ -1,0 +1,165 @@
+
+#include "../nubia/NX616J/dsi-panel-himax-boe-1080x2280-cmd.dtsi"
+
+&soc {
+	nubia_dsi_panel_pwr_supply: nubia_dsi_panel_pwr_supply {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			qcom,panel-supply-entry@0 {
+				reg = <0>;
+				qcom,supply-name = "lab";
+				qcom,supply-min-voltage = <5400000>;
+				qcom,supply-max-voltage = <5600000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};
+			qcom,panel-supply-entry@1 {
+				reg = <1>;
+				qcom,supply-name = "ibb";
+				qcom,supply-min-voltage = <5400000>;
+				qcom,supply-max-voltage = <5600000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};
+		};
+//start :add the power of lcds for NX616J -------0330
+	nubia_dsi_panel_pwr_supply_boe: nubia_dsi_panel_pwr_supply_boe {
+			#address-cells = <1>;
+			#size-cells = <0>;
+		qcom,panel-supply-entry@0 {
+			reg = <0>;
+			qcom,supply-name = "vddio";
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
+			qcom,supply-enable-load = <62000>;
+			qcom,supply-disable-load = <80>;
+			qcom,supply-post-on-sleep = <20>;
+		};			
+			qcom,panel-supply-entry@1 {
+				reg = <1>;
+				qcom,supply-name = "lab";
+				qcom,supply-min-voltage = <5400000>;
+				qcom,supply-max-voltage = <5600000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};
+			qcom,panel-supply-entry@2 {
+				reg = <2>;
+				qcom,supply-name = "ibb";
+				qcom,supply-min-voltage = <5400000>;
+				qcom,supply-max-voltage = <5600000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};
+		/*	
+			qcom,panel-supply-entry@3 {
+				reg = <3>;
+				qcom,supply-name = "sub_lcd";
+				qcom,supply-min-voltage = <3000000>;
+				qcom,supply-max-voltage = <3000000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};*/
+		};
+
+
+
+	nubia_dsi_panel_pwr_supply_boe_sub: nubia_dsi_panel_pwr_supply_boe_sub {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			qcom,panel-supply-entry@0 {
+				reg = <0>;
+				qcom,supply-name = "sub_lcd";
+				qcom,supply-min-voltage = <3000000>;
+				qcom,supply-max-voltage = <3000000>;
+				qcom,supply-enable-load = <100000>;
+				qcom,supply-disable-load = <100>;
+			};
+		};
+//End :add the power of lcds for NX616J -------0330
+//start : add for NX616J lcd
+
+	dsi_nubia_boe_himax_cmd_display: qcom,dsi-display@19 {
+		compatible = "qcom,dsi-display";
+		label = "dsi_nubia_boe_himax_cmd_display";
+		qcom,display-type = "primary";
+
+		qcom,dsi-ctrl = <&mdss_dsi0>;
+		qcom,dsi-phy = <&mdss_dsi_phy0>;
+		clocks = <&mdss_dsi0_pll BYTECLK_MUX_0_CLK>,
+			<&mdss_dsi0_pll PCLK_MUX_0_CLK>;
+		clock-names = "src_byte_clk", "src_pixel_clk";
+
+		pinctrl-names = "panel_active", "panel_suspend";
+		pinctrl-0 = <&sde_dsi_active &sde_te_active>;
+		pinctrl-1 = <&sde_dsi_suspend &sde_te_suspend>;
+		qcom,platform-te-gpio = <&tlmm 10 0>;
+		qcom,platform-reset-gpio = <&tlmm 6 0>;
+		qcom,panel-mode-gpio = <&tlmm 32 0>;
+
+		qcom,dsi-panel = <&dsi_nubia_boe_himax_cmd>;
+		lab-supply = <&lab_regulator>;
+		ibb-supply = <&ibb_regulator>;
+		vddio-supply = <&pm8998_l14>;
+		sub_lcd-supply = <&pm8998_l22>;
+
+		qcom,dsi-display-active;
+	};
+//end : add for NX616J lcd
+
+};
+
+
+&dsi_nubia_boe_himax_cmd{
+				qcom,panel-supply-entries = <&nubia_dsi_panel_pwr_supply_boe>;
+				qcom,sub-panel-supply-entries = <&nubia_dsi_panel_pwr_supply_boe_sub>;
+
+				qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
+				qcom,mdss-brightness-max-level = <4095>;
+				qcom,mdss-dsi-bl-min-level = <15>;
+				qcom,mdss-dsi-bl-max-level = <4095>;
+				qcom,mdss-dsi-mode-sel-gpio-state = "single_port";
+				qcom,platform-reset-gpio = <&tlmm 6 0>;
+				qcom,platform-sub-lcd-reset-gpio = <&tlmm 7 0>;
+				qcom,platform-te-gpio = <&tlmm 10 0>;
+				qcom,platform-lcd-switch-en-gpio = <&tlmm 29 0>;
+				qcom,platform-lcd-switch-gpio = <&tlmm 39 0>;
+				qcom,platform-sub-lcd-power-1p8-gpio = <&tlmm 35 0>;
+				qcom,platform-sub-tp-reset-gpio = <&tlmm 99 0>;
+				qcom,platform-sub-lcd-fd-gpio = <&tlmm 95 0>;
+};
+
+&sde_dp {
+	/* io43 and gpio 51 is used by audio,gio 2 and gpio 3 connect nothing for gpio request crash */
+	qcom,aux-en-gpio = <&tlmm 2 0>;
+	qcom,aux-sel-gpio = <&tlmm 3 0>;
+};
+
+
+
+&sde_dp_aux_active {
+	mux {
+		pins = "gpio2", "gpio3";
+		function = "gpio";
+	};
+
+	config {
+		pins = "gpio2", "gpio3";
+		bias-disable = <0>; // no pull
+		drive-strength = <8>;
+	};
+};
+
+&sde_dp_aux_suspend  {
+	mux {
+		pins = "gpio2", "gpio3";
+		function = "gpio";
+	};
+
+	config {
+		pins = "gpio2", "gpio3";
+		bias-pull-down;
+		drive-strength = <2>;
+	};
+};

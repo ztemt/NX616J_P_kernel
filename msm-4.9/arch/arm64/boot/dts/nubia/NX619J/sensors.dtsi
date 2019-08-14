@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&pm8998_gpios {
+	tfa9xxx_clk {
+		tfa9xxx_clk_default: tfa9xxx_clk_default {
+			pins = "gpio16"; /* GPIO 16 */
+			function = "func2"; /* Special Function 2 */
+			bias-disable; /* No Pull */
+			power-source = <0>; /* VIN0 */
+			output-low; /* digital output, no invert */
+			input-disable; /* prevent GPIO from being set to DIO */
+		};
+	};
+};
+
+&qupv3_se3_i2c {
+	status = "ok";
+	tfa9xxx@36 {
+		status = "ok";
+		compatible = "nubia,tfa9xxx";
+		reg =<0x36>;
+		reset-gpio = <&tlmm 7 0x00>;
+		//irq-gpio = <&tlmm 8 0x00>;
+		haptic;
+		pinctrl-names = "tfa9xxx_clk_default";
+		pinctrl-0 = <&tfa9xxx_clk_default>;
+		clock-names = "mclk";
+		clocks = <&pm8998_div_clk3 0>;//div_clk1->1, div_clk2->2
+	};
+};
+
+
+&qupv3_se10_i2c {
+	/delete-node/ nubia@39;
+};
+
+&qupv3_se10_i2c {
+	status = "ok";
+	ams@39 {
+		compatible = "tmd2725";
+		reg = <0x39>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <119 0>;
+		vdd-supply = <&pm8998_l19>;
+		//vio-supply = <&pm8998_s4>;
+		vio-supply = <&pm8998_lvs2>;
+		tmd,irq-gpio = <&tlmm 119 0x00>;
+		pinctrl-names = "tmd2725_default","tmd2725_sleep";
+		pinctrl-0 = <&tmd2725_default>;
+		pinctrl-1 = <&tmd2725_sleep>;
+		tmd,power_always_on = <1>;
+		tmd,has_als = <1>;
+		tmd,has_ps = <1>;
+		tmd,tp_moudle_count = <3>;
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp0 = "0","0","652","1000","142","874","99";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp1 = "1","1","652","1000","142","874","99";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp2 = "2","0","652","1000","142","874","99";
+	};
+};
+
+&pm8998_s4 {
+	status = "ok";
+	regulator-boot-on;
+};
+
+&pm8998_lvs2 {
+	status = "ok";
+	regulator-boot-on;
+};
+
+&pm8998_l19 {
+	status = "ok";
+	qcom,init-voltage = <3000000>;
+	regulator-boot-on;
+};
+
+&tlmm {
+	tmd2725_int_pin {
+		tmd2725_default: tmd2725_default {
+			config {
+				pins = "gpio119";
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+		tmd2725_sleep: tmd2725_sleep {
+			config {
+				pins = "gpio119";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+	};
+};
+

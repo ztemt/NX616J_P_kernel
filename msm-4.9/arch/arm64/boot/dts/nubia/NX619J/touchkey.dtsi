@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&qupv3_se0_i2c {
+	status = "okay";
+	cypress_touchkey@10 {
+                status = "okay";
+                compatible = "cypress,touchkey-i2c";
+                reg = <0x10>;
+                interrupt-parent = <&tlmm>;
+                interrupts = <43 0x2002>;
+                touchkey,irq-gpio = <&tlmm 43 0x2002>;
+                touchkey,irq-on-state = <0>;
+                touchkey,irq-flags = <0x2002>;  //IRQF_ONESHOT | IRQF_TRIGGER_FALLING
+                //pinctrl-names = "synaptics_pin_active", "synaptics_pin_suspend";
+                //pinctrl-0 = <&synaptics_int_active &synaptics_pwen_active>;
+                //pinctrl-1 = <&synaptics_int_suspend &synaptics_pwen_suspend>;
+	};
+};
+
